@@ -4,6 +4,7 @@ module Payoneer
   class Payee
     SIGNUP_URL_API_METHOD_NAME = 'GetToken'
     PAYEE_DETAILS_API_METHOD_NAME = 'GetPayeeDetails'
+    CHANGE_PAYEE_ID_API_METHOD_NAME = 'ChangePayeeID'
 
     def self.signup_url(payee_id, redirect_url: nil, redirect_time: nil)
       payoneer_params = {
@@ -32,6 +33,21 @@ module Payoneer
 
       if success?(response)
         Response.new_ok_response(response['Payee'])
+      else
+        Response.new(response['Code'], response['Description'])
+      end
+    end
+
+    def self.change_payee_id(old_payee_id, new_payee_id)
+      payoneer_params = {
+        p4: old_payee_id,
+        p5: new_payee_id
+      }
+
+      response = Payoneer.make_api_request(CHANGE_PAYEE_ID_API_METHOD_NAME, payoneer_params)
+
+      if success?(response)
+        Response.new_ok_response(response)
       else
         Response.new(response['Code'], response['Description'])
       end
